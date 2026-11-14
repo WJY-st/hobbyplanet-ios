@@ -1,0 +1,65 @@
+name: iOS Build & Test
+
+# 用 GitHub 提供的 macOS 云端机器编译本工程并跑单元测试。
+# 触发方式：推送代码、网页上手动点 Run workflow。
+on:
+  push:
+    branches: [ "**" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    # macos-15 自带 Xcode 16.x 与 iPhone 16 模拟器
+    runs-on: macos-15
+    timeout-minutes: 30
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 查看 Xcode 版本
+        run: |
+          xcodebuild -version
+          xcode-select -p
+
+      - name: 列出可用的模拟器
+        run: xcrun simctl list devices available | sed -n '1,60p'
+
+      - name: 编译 App（模拟器，不需要签名）
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project HobbyPlanet.xcodeproj \
+            -scheme HobbyPlanet \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            | tee build.log
+
+      - name: 运行单元测试
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project HobbyPlanet.xcodeproj \
+            -scheme HobbyPlanet \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -derivedDataPath build \
+            -resultBundlePath TestResults.xcresult \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            | tee test.log
+
+      - name: 失败时也上传日志
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: |
+            build.log
+            test.log
+            TestResults.xcresult
+          if-no-files-found: ignore
+          retention-days: 7
