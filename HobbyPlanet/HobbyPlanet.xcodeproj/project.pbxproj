@@ -151,12 +151,6 @@
 				C4A7F8AA74C56A7277485F29 /* Services */,
 				CFE969A149DAF6BA449A8B19 /* Store */,
 				A7F58FA429100E1D1FF0C984 /* Views */,
-				605111F9E7907257C8D0A4F7 /* Views/Assistant */,
-				C03BB9DA06CB9FE6A558F17F /* Views/Components */,
-				1CE6C2F561C8A18BB8FEBBBA /* Views/Discover */,
-				9B51255F7A2A73666249D315 /* Views/Profile */,
-				91DE8F641C2DD02D1F8AA67F /* Views/Publish */,
-				434E6B652DDF1B963102C3CF /* Views/Radar */,
 				50C6BC16A4785D522C8AA084 /* Assets.xcassets */,
 			);
 			path = HobbyPlanet;
@@ -226,12 +220,18 @@
 			isa = PBXGroup;
 			children = (
 				F90D9D73AD7060CCF5F11967 /* OnboardingView.swift */,
+				605111F9E7907257C8D0A4F7 /* Assistant */,
+				C03BB9DA06CB9FE6A558F17F /* Components */,
+				1CE6C2F561C8A18BB8FEBBBA /* Discover */,
+				9B51255F7A2A73666249D315 /* Profile */,
+				91DE8F641C2DD02D1F8AA67F /* Publish */,
+				434E6B652DDF1B963102C3CF /* Radar */,
 			);
 			path = Views;
 			sourceTree = "<group>";
 		};
 
-		605111F9E7907257C8D0A4F7 /* Views/Assistant */ = {
+		605111F9E7907257C8D0A4F7 /* Assistant */ = {
 			isa = PBXGroup;
 			children = (
 				7E9786E415A2B8FE51DE772D /* AssistantView.swift */,
@@ -240,7 +240,7 @@
 			sourceTree = "<group>";
 		};
 
-		C03BB9DA06CB9FE6A558F17F /* Views/Components */ = {
+		C03BB9DA06CB9FE6A558F17F /* Components */ = {
 			isa = PBXGroup;
 			children = (
 				B093EF80C6C618E6748255A6 /* AvatarView.swift */,
@@ -253,7 +253,7 @@
 			sourceTree = "<group>";
 		};
 
-		1CE6C2F561C8A18BB8FEBBBA /* Views/Discover */ = {
+		1CE6C2F561C8A18BB8FEBBBA /* Discover */ = {
 			isa = PBXGroup;
 			children = (
 				5C3CCEB070162AC2EC2DDB50 /* ActivityCards.swift */,
@@ -264,7 +264,7 @@
 			sourceTree = "<group>";
 		};
 
-		9B51255F7A2A73666249D315 /* Views/Profile */ = {
+		9B51255F7A2A73666249D315 /* Profile */ = {
 			isa = PBXGroup;
 			children = (
 				1D77B8494607BC880931EEAC /* InterestEditorView.swift */,
@@ -276,7 +276,7 @@
 			sourceTree = "<group>";
 		};
 
-		91DE8F641C2DD02D1F8AA67F /* Views/Publish */ = {
+		91DE8F641C2DD02D1F8AA67F /* Publish */ = {
 			isa = PBXGroup;
 			children = (
 				A1C0DB5C667FFB44A9E7314C /* AIPlanSheet.swift */,
@@ -286,7 +286,7 @@
 			sourceTree = "<group>";
 		};
 
-		434E6B652DDF1B963102C3CF /* Views/Radar */ = {
+		434E6B652DDF1B963102C3CF /* Radar */ = {
 			isa = PBXGroup;
 			children = (
 				5FE730056BB0CFC4CF74D265 /* InterestRadarChart.swift */,
