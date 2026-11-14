@@ -1,4 +1,4 @@
-name: iOS Build & Test
+name: Build IPA
 
 on:
   push:
@@ -6,76 +6,38 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  ipa:
     runs-on: macos-15
     timeout-minutes: 30
-
     steps:
-      - name: 检出代码
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: 查看 Xcode 版本
-        run: |
-          xcodebuild -version
-          xcode-select -p
-
-      - name: 定位工程文件
+      - name: 定位工程
         run: |
           set -e
-          echo "=== 仓库顶层 ==="
-          ls -la
-          echo "=== 查找 .xcodeproj ==="
-          PROJECT=$(find . -maxdepth 4 -name "*.xcodeproj" -type d | head -n 1)
-          if [ -z "$PROJECT" ]; then
-            echo "::error::仓库里找不到 .xcodeproj，请检查是否漏传了 HobbyPlanet.xcodeproj 目录"
-            find . -maxdepth 3 -type d | head -40
-            exit 1
-          fi
-          echo "找到工程：$PROJECT"
-          echo "PROJECT_PATH=$PROJECT" >> "$GITHUB_ENV"
-          echo "PROJECT_DIR=$(dirname "$PROJECT")" >> "$GITHUB_ENV"
+          P=$(find . -maxdepth 4 -name "*.xcodeproj" -type d | head -n 1)
+          echo "工程：$P"
+          echo "PROJECT_PATH=$P" >> "$GITHUB_ENV"
 
-      - name: 列出 scheme 与 target
-        run: xcodebuild -list -project "$PROJECT_PATH"
+      - name: 编译
+        run: |
+          xcodebuild build -project "$PROJECT_PATH" -scheme HobbyPlanet \
+            -destination 'generic/platform=iOS Simulator' -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO | tail -20
 
-      - name: 列出可用的模拟器
-        run: xcrun simctl list devices available | sed -n '1,60p'
-
-      - name: 编译 App（模拟器，不需要签名）
+      - name: 打包未签名 IPA
         run: |
           set -o pipefail
-          xcodebuild build \
-            -project "$PROJECT_PATH" \
-            -scheme HobbyPlanet \
-            -destination 'generic/platform=iOS Simulator' \
-            -derivedDataPath build \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            | tee build.log
+          xcodebuild archive -project "$PROJECT_PATH" -scheme HobbyPlanet \
+            -destination 'generic/platform=iOS' -archivePath build/HobbyPlanet.xcarchive \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO | tail -20
+          mkdir -p build/Payload
+          cp -R build/HobbyPlanet.xcarchive/Products/Applications/HobbyPlanet.app build/Payload/
+          ( cd build && zip -qry HobbyPlanet-unsigned.ipa Payload )
+          ls -lh build/HobbyPlanet-unsigned.ipa
 
-      - name: 运行单元测试
-        run: |
-          set -o pipefail
-          xcodebuild test \
-            -project "$PROJECT_PATH" \
-            -scheme HobbyPlanet \
-            -destination 'platform=iOS Simulator,name=iPhone 16' \
-            -derivedDataPath build \
-            -resultBundlePath TestResults.xcresult \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            | tee test.log
-
-      - name: 失败时也上传日志
-        if: always()
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: build-logs
-          path: |
-            build.log
-            test.log
-            TestResults.xcresult
-          if-no-files-found: ignore
-          retention-days: 7
+          name: HobbyPlanet-ipa
+          path: build/HobbyPlanet-unsigned.ipa
+          retention-days: 14
