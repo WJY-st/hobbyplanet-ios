@@ -1,7 +1,5 @@
 name: iOS Build & Test
 
-# 用 GitHub 提供的 macOS 云端机器编译本工程并跑单元测试。
-# 触发方式：推送代码、网页上手动点 Run workflow。
 on:
   push:
     branches: [ "**" ]
@@ -9,7 +7,6 @@ on:
 
 jobs:
   build:
-    # macos-15 自带 Xcode 16.x 与 iPhone 16 模拟器
     runs-on: macos-15
     timeout-minutes: 30
 
@@ -22,6 +19,25 @@ jobs:
           xcodebuild -version
           xcode-select -p
 
+      - name: 定位工程文件
+        run: |
+          set -e
+          echo "=== 仓库顶层 ==="
+          ls -la
+          echo "=== 查找 .xcodeproj ==="
+          PROJECT=$(find . -maxdepth 4 -name "*.xcodeproj" -type d | head -n 1)
+          if [ -z "$PROJECT" ]; then
+            echo "::error::仓库里找不到 .xcodeproj，请检查是否漏传了 HobbyPlanet.xcodeproj 目录"
+            find . -maxdepth 3 -type d | head -40
+            exit 1
+          fi
+          echo "找到工程：$PROJECT"
+          echo "PROJECT_PATH=$PROJECT" >> "$GITHUB_ENV"
+          echo "PROJECT_DIR=$(dirname "$PROJECT")" >> "$GITHUB_ENV"
+
+      - name: 列出 scheme 与 target
+        run: xcodebuild -list -project "$PROJECT_PATH"
+
       - name: 列出可用的模拟器
         run: xcrun simctl list devices available | sed -n '1,60p'
 
@@ -29,7 +45,7 @@ jobs:
         run: |
           set -o pipefail
           xcodebuild build \
-            -project HobbyPlanet.xcodeproj \
+            -project "$PROJECT_PATH" \
             -scheme HobbyPlanet \
             -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath build \
@@ -42,7 +58,7 @@ jobs:
         run: |
           set -o pipefail
           xcodebuild test \
-            -project HobbyPlanet.xcodeproj \
+            -project "$PROJECT_PATH" \
             -scheme HobbyPlanet \
             -destination 'platform=iOS Simulator,name=iPhone 16' \
             -derivedDataPath build \
