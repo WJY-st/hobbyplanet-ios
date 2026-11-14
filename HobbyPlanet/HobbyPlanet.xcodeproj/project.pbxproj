@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		E12BF88ACC031C4570F30FCD /* HobbyPlanetApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF2666C597902728072B4B56 /* HobbyPlanetApp.swift */; };
 		41C0D35481B9036F44997BA1 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFB3E88D4040D693500AF1EB /* RootView.swift */; };
+		C0B7C3F1E2BD43846563C01D /* ScreenshotSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FCDD842B77F30ED8789A58 /* ScreenshotSupport.swift */; };
 		117A9701BC3CA56ADCEF817B /* Formatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5576F9A03D9E2972C1B53A42 /* Formatters.swift */; };
 		8D6FF406A1203474052E4BDB /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A750C6785B27ED39AD161C /* Haptics.swift */; };
 		A0678DB2FEB96D4A2013FD35 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70EDB44E47BB2B63EDCD9280 /* Theme.swift */; };
@@ -65,6 +66,7 @@
 		50C6BC16A4785D522C8AA084 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FF2666C597902728072B4B56 /* HobbyPlanetApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HobbyPlanetApp.swift; sourceTree = "<group>"; };
 		DFB3E88D4040D693500AF1EB /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		66FCDD842B77F30ED8789A58 /* ScreenshotSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotSupport.swift; sourceTree = "<group>"; };
 		5576F9A03D9E2972C1B53A42 /* Formatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatters.swift; sourceTree = "<group>"; };
 		E6A750C6785B27ED39AD161C /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		70EDB44E47BB2B63EDCD9280 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
@@ -162,6 +164,7 @@
 			children = (
 				FF2666C597902728072B4B56 /* HobbyPlanetApp.swift */,
 				DFB3E88D4040D693500AF1EB /* RootView.swift */,
+				66FCDD842B77F30ED8789A58 /* ScreenshotSupport.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -409,6 +412,7 @@
 			files = (
 				E12BF88ACC031C4570F30FCD /* HobbyPlanetApp.swift in Sources */,
 				41C0D35481B9036F44997BA1 /* RootView.swift in Sources */,
+				C0B7C3F1E2BD43846563C01D /* ScreenshotSupport.swift in Sources */,
 				117A9701BC3CA56ADCEF817B /* Formatters.swift in Sources */,
 				8D6FF406A1203474052E4BDB /* Haptics.swift in Sources */,
 				A0678DB2FEB96D4A2013FD35 /* Theme.swift in Sources */,

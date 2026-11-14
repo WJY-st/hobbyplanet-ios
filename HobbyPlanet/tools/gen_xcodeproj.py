@@ -196,35 +196,36 @@ def main():
     add("\t\t};")
     add("")
 
-    # App 组：根层文件 + 子目录组
-    add("\t\t%s /* %s */ = {" % (app_group_uuid, APP))
-    add("\t\t\tisa = PBXGroup;")
-    add("\t\t\tchildren = (")
-    top_level = app_src.get("", [])
-    for item in top_level:
-        add("\t\t\t\t%s /* %s */," % (item.uuid, item.name))
-    subdirs = sorted(k for k in app_src.keys() if k)
-    for sub in subdirs:
-        add("\t\t\t\t%s /* %s */," % (uid("group:" + APP + "/" + sub), sub.replace("/", "/")))
-    add("\t\t\t\t%s /* Assets.xcassets */," % assets.uuid)
-    add("\t\t\t);")
-    add("\t\t\tpath = %s;" % APP)
-    add("\t\t\tsourceTree = \"<group>\";")
-    add("\t\t};")
-    add("")
+    # App 组：按真实目录层级嵌套生成 PBXGroup。
+    # 注意：每个组只写自己这一层的目录名（path = 目录名），父子关系通过 children 表达；
+    # 如果把 "Views/Assistant" 平铺成顶层组并写 path = Assistant，
+    # Xcode 会把它解析到 HobbyPlanet/Assistant，导致 17 个源文件找不到（CI 曾因此失败）。
+    children_of = {}
+    for key in app_src:
+        parent = key.rsplit("/", 1)[0] if "/" in key else ""
+        children_of.setdefault(parent, []).append(key)
 
-    for sub in subdirs:
-        group_uuid = uid("group:" + APP + "/" + sub)
-        add("\t\t%s /* %s */ = {" % (group_uuid, sub))
+    def emit_group(node, is_root=False):
+        group_uuid = app_group_uuid if is_root else uid("group:" + APP + "/" + node)
+        name = APP if is_root else os.path.basename(node)
+        add("\t\t%s /* %s */ = {" % (group_uuid, name))
         add("\t\t\tisa = PBXGroup;")
         add("\t\t\tchildren = (")
-        for item in app_src[sub]:
+        for item in app_src.get(node, []):
             add("\t\t\t\t%s /* %s */," % (item.uuid, item.name))
+        for child in sorted(children_of.get(node, [])):
+            add("\t\t\t\t%s /* %s */," % (uid("group:" + APP + "/" + child), os.path.basename(child)))
+        if is_root:
+            add("\t\t\t\t%s /* Assets.xcassets */," % assets.uuid)
         add("\t\t\t);")
-        add("\t\t\tpath = %s;" % quote(os.path.basename(sub)))
+        add("\t\t\tpath = %s;" % quote(name))
         add("\t\t\tsourceTree = \"<group>\";")
         add("\t\t};")
         add("")
+        for child in sorted(children_of.get(node, [])):
+            emit_group(child)
+
+    emit_group("", is_root=True)
 
     add("\t\t%s /* %s */ = {" % (tests_group_uuid, TESTS))
     add("\t\t\tisa = PBXGroup;")

@@ -15,6 +15,8 @@ struct AIPlanSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     @Binding var category: HobbyCategory
+    /// CI 截图用：预填一句想法并自动生成
+    var prefillIdea: String = ""
     var onApply: (AIPlanDraft) -> Void
 
     @State private var idea: String = ""
@@ -66,6 +68,13 @@ struct AIPlanSheet: View {
                     .foregroundColor(draft == nil ? Palette.inkTertiary : Palette.brand)
                     .disabled(draft == nil)
                 }
+            }
+            .task {
+                // 仅截图场景：预填想法后自动生成一次（无密钥时走本地模板，仍会出完整草案）
+                guard draft == nil, !prefillIdea.isEmpty else { return }
+                idea = prefillIdea
+                try? await Task.sleep(nanoseconds: 500_000_000)
+                generate()
             }
         }
     }

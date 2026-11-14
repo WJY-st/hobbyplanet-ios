@@ -28,6 +28,14 @@ struct PublishView: View {
     @State private var showValidation: Bool = false
     @State private var validationMessage: String = ""
 
+    /// CI 截图用：进页面就弹出 AI 面板，并预填一句想法
+    private let prefillIdea: String
+
+    init(autoOpenAI: Bool = false, prefillIdea: String = "") {
+        self.prefillIdea = prefillIdea
+        _showAIPlan = State(initialValue: autoOpenAI)
+    }
+
     // MARK: - 校验
 
     private var trimmedTitle: String { title.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -71,7 +79,7 @@ struct PublishView: View {
                 }
             }
             .sheet(isPresented: $showAIPlan) {
-                AIPlanSheet(category: $category) { draft in
+                AIPlanSheet(category: $category, prefillIdea: prefillIdea) { draft in
                     apply(draft)
                 }
             }

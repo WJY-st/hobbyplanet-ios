@@ -1,4 +1,4 @@
-//
+﻿//
 //  RootView.swift
 //  HobbyPlanet
 //
@@ -31,7 +31,7 @@ struct RootView: View {
             Palette.canvas.ignoresSafeArea()
 
             if profileStore.profile.didFinishOnboarding {
-                MainTabView()
+                MainTabView(initialTab: ScreenshotScenario.current?.initialTab ?? .discover)
                     .transition(.opacity.combined(with: .scale(scale: 0.98)))
             } else {
                 OnboardingView()
@@ -39,6 +39,17 @@ struct RootView: View {
             }
         }
         .animation(.easeInOut(duration: 0.32), value: profileStore.profile.didFinishOnboarding)
+        .onAppear(perform: prepareScreenshotState)
+    }
+
+    /// CI 截图时预置用户档案；正常启动时 ScreenshotScenario.current 为 nil，什么也不做
+    private func prepareScreenshotState() {
+        guard let scenario = ScreenshotScenario.current else { return }
+        if scenario.needsProfile {
+            profileStore.applyScreenshotProfile()
+        } else {
+            profileStore.resetForScreenshot()
+        }
     }
 }
 
@@ -50,7 +61,11 @@ struct MainTabView: View {
         case profile
     }
 
-    @State private var selection: Tab = .discover
+    @State private var selection: Tab
+
+    init(initialTab: Tab = .discover) {
+        _selection = State(initialValue: initialTab)
+    }
 
     var body: some View {
         TabView(selection: $selection) {
@@ -66,7 +81,7 @@ struct MainTabView: View {
                 }
                 .tag(Tab.radar)
 
-            AssistantView()
+            AssistantView(autoQuestion: ScreenshotScenario.current?.autoQuestion ?? "")
                 .tabItem {
                     Label("AI 助手", systemImage: "bubble.left.and.bubble.right.fill")
                 }

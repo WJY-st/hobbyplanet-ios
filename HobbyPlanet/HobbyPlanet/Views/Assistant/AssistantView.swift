@@ -18,6 +18,8 @@ struct AssistantView: View {
     @State private var isThinking: Bool = false
     @State private var offlineHint: String?
     @FocusState private var inputFocused: Bool
+    /// CI 截图用：进页面自动提一个问题
+    var autoQuestion: String = ""
 
     private let quickPrompts = [
         "周末有什么活动推荐？",
@@ -69,6 +71,12 @@ struct AssistantView: View {
                     .foregroundColor(Palette.inkSecondary)
                     .disabled(messages.isEmpty)
                 }
+            }
+            .task {
+                // 仅截图场景：自动提一个问题，拿到回答后再截图
+                guard !autoQuestion.isEmpty, messages.isEmpty else { return }
+                try? await Task.sleep(nanoseconds: 700_000_000)
+                send(autoQuestion)
             }
         }
     }

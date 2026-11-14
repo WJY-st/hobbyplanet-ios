@@ -15,6 +15,7 @@ struct DiscoverView: View {
     @State private var searchText: String = ""
     @State private var selectedCategory: HobbyCategory?
     @State private var showPublish: Bool = false
+    @State private var path = NavigationPath()
 
     // MARK: - 数据
 
@@ -63,7 +64,7 @@ struct DiscoverView: View {
     // MARK: - 视图
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     header
@@ -96,8 +97,27 @@ struct DiscoverView: View {
                 }
             }
             .sheet(isPresented: $showPublish) {
-                PublishView()
+                PublishView(autoOpenAI: ScreenshotScenario.current == .aiplan,
+                            prefillIdea: ScreenshotScenario.current?.autoIdea ?? "")
             }
+            .onAppear(perform: applyScreenshotScenario)
+        }
+    }
+
+    /// CI 截图时直接进入指定页面；正常使用时 ScreenshotScenario.current 为 nil
+    private func applyScreenshotScenario() {
+        guard let scenario = ScreenshotScenario.current else { return }
+        switch scenario {
+        case .detail:
+            guard let first = store.upcoming.first else { return }
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 600_000_000)
+                path.append(AppRoute.activity(first.id))
+            }
+        case .publish, .aiplan:
+            showPublish = true
+        default:
+            break
         }
     }
 
